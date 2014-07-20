@@ -14,6 +14,7 @@ using System.Threading;
 
 namespace ClientsPart
 {
+    // test commentsdsfd
     public class Game : IGame
     {
         private IGameContract _contract;
