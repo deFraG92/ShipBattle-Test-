@@ -12,6 +12,7 @@ namespace Graphic
 {
     public class Drawing : IDrawing
     {
+        //first com
         private Graphics _graph;
         private Coordinates _gameOptionList;
         private Coordinates _gridOptionList;
