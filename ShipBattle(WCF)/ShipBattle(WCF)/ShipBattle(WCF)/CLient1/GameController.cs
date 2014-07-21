@@ -16,12 +16,6 @@ namespace ClientsPart
         private readonly Control _animationControl;
         private bool _isConnected;
         private string _uid;
-        private GameOptions _options;
-        private IGame _game;
-        private bool _isConnected;
-        private string _uid;
-        private Control _baseControl;
-        private Control _animationControl;
         private int _shipsCounter = 0;
         private List<string> _turnCollection;
         private bool _clientReady;

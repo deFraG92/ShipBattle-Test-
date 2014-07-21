@@ -32,10 +32,7 @@
             this.ReadyBut = new System.Windows.Forms.Button();
             this.ShipTypeCMB = new System.Windows.Forms.ComboBox();
             this.ShipTurnCMB = new System.Windows.Forms.ComboBox();
-<<<<<<< HEAD
             this.textBox1 = new System.Windows.Forms.TextBox();
-=======
->>>>>>> cdf1f02794fbf10180edcf96046aae158e2230de
             this.SuspendLayout();
             // 
             // ReadyBut
@@ -74,7 +71,7 @@
             this.ShipTurnCMB.Text = "StraightShip";
             this.ShipTurnCMB.SelectedValueChanged += new System.EventHandler(this.ShipTurn_SelectedValueChanged);
             // 
-<<<<<<< HEAD
+
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(1, 438);
@@ -83,8 +80,6 @@
             this.textBox1.Size = new System.Drawing.Size(838, 156);
             this.textBox1.TabIndex = 8;
             // 
-=======
->>>>>>> cdf1f02794fbf10180edcf96046aae158e2230de
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -93,10 +88,8 @@
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ClientSize = new System.Drawing.Size(842, 606);
-<<<<<<< HEAD
+
             this.Controls.Add(this.textBox1);
-=======
->>>>>>> cdf1f02794fbf10180edcf96046aae158e2230de
             this.Controls.Add(this.ShipTurnCMB);
             this.Controls.Add(this.ShipTypeCMB);
             this.Controls.Add(this.ReadyBut);
@@ -107,10 +100,7 @@
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Field_Paint);
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Field_MouseClick);
             this.ResumeLayout(false);
-<<<<<<< HEAD
             this.PerformLayout();
-=======
->>>>>>> cdf1f02794fbf10180edcf96046aae158e2230de
 
         }
 

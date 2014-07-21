@@ -21,7 +21,7 @@ namespace ClientsPart
             BaseGameSettingsInit();
         }
 
-        private GameController _controller;
+        private readonly GameController _controller;
         private string _shipType;
         private string _shipTurn;
         private Cursor _cursor;
@@ -71,7 +71,6 @@ namespace ClientsPart
         private void Field_Paint(object sender, PaintEventArgs e)
         {
 
-
             _controller.Redraw(e.ClipRectangle);
             //if (e.ClipRectangle.Location.X != 0)
             //{
@@ -108,7 +107,7 @@ namespace ClientsPart
         private void Field_Hit_MouseClick(object sender, MouseEventArgs e)
         {
             textBox1.Text = String.Empty;
-            if (_controller.ClientsReady())
+            if (!_controller.ClientsReady())
             {
                 _controller.HitShipOnClick(e);
                 _counter = 0;
