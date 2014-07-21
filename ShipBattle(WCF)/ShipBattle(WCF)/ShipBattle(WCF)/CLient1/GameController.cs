@@ -16,6 +16,12 @@ namespace ClientsPart
         private readonly Control _animationControl;
         private bool _isConnected;
         private string _uid;
+        private GameOptions _options;
+        private IGame _game;
+        private bool _isConnected;
+        private string _uid;
+        private Control _baseControl;
+        private Control _animationControl;
         private int _shipsCounter = 0;
         private List<string> _turnCollection;
         private bool _clientReady;
@@ -61,18 +67,15 @@ namespace ClientsPart
         {
             if (_uid == "Client1")
             {
-                _baseControl.Location = new Point(50, 50);
                 _options.MyBattleFieldLocation = new Coordinates(50, 150);
                 _options.EnemyBattleFieldLocation = new Coordinates(500, 150);
             }
             else if (_uid == "Client2")
             {
-                _baseControl.Location = new Point(500, 50);
                 _options.MyBattleFieldLocation = new Coordinates(500, 150);
                 _options.EnemyBattleFieldLocation = new Coordinates(50, 150);
             }
             _game.UpdateOptions(_options);
-            
         }
 
         public void Redraw(Rectangle rectangle)

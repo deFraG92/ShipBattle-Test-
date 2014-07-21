@@ -27,6 +27,7 @@ namespace ClientsPart
         private Cursor _cursor;
         private static int _counter = 0;
         
+
         private void BaseGameSettingsInit()
         {
             _controller.GameConnect();
@@ -70,6 +71,7 @@ namespace ClientsPart
         private void Field_Paint(object sender, PaintEventArgs e)
         {
 
+
             _controller.Redraw(e.ClipRectangle);
             //if (e.ClipRectangle.Location.X != 0)
             //{
@@ -80,7 +82,8 @@ namespace ClientsPart
             //}
             
         }
-    
+        
+
 
         private void Field_Hit_Paint(object sender, PaintEventArgs e)
         {
@@ -145,8 +148,6 @@ namespace ClientsPart
             this.Cursor = Cursors.Default;
         }
 
-
-        
     }
 
 

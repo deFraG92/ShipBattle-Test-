@@ -16,6 +16,7 @@ namespace Graphic
         private Coordinates _gameOptionList;
         private Coordinates _gridOptionList;
         private GameOptions _options;
+        private Rectangle _bufRocketCoords;
 
         public Drawing(Graphics graph, GameOptions options)
         {
@@ -31,43 +32,42 @@ namespace Graphic
         {
             if (!rectangle.IsEmpty)
             {
-                var baseRect1 = new Rectangle((int)_options.MyBattleFieldLocation.X, (int)_options.MyBattleFieldLocation.Y, 
-                                (int)_gameOptionList.X, (int)_gameOptionList.Y);
-                var baseRect2 = new Rectangle((int)_options.EnemyBattleFieldLocation.X, (int)_options.EnemyBattleFieldLocation.Y,
-                                (int)_gameOptionList.X, (int)_gameOptionList.Y);
-                if (baseRect1.Contains(rectangle) | baseRect2.Contains(rectangle))
-                {
-                    var redrawX =
-                        (int) (Math.Floor((rectangle.X + rectangle.Width)/_gridOptionList.X)*_gridOptionList.X) - 10;
-                    var redrawY =
-                        (int) (Math.Floor((rectangle.Y + rectangle.Height)/_gridOptionList.Y)*_gridOptionList.Y);
-                    //_graph.DrawLine(new Pen(Color.Red, 2), rectangle.X, redrawY, rectangle.X + rectangle.Width, redrawY);
-                    // _graph.DrawLine(new Pen(Color.Red, 3), redrawX, rectangle.Y, redrawX, rectangle.Y + rectangle.Height);
-                    //_graph.DrawRectangle(new Pen(Color.Blue, 2), rectangle);
-                    _graph.DrawRectangle(new Pen(Color.Blue, 2),
-                        new Rectangle(redrawX, redrawY, (int) _gridOptionList.X, (int) _gridOptionList.Y));
-                }
-                //else
-                //{
-                //    _graph.DrawRectangle(new Pen(Color.Yellow, 2), rectangle);
-                //}
+                DrawAnimationRocket(rectangle, pen);
                 return;
-                
             }
-            for (double i = deltaCoord.X; i <= _gameOptionList.X + deltaCoord.X; i += _gridOptionList.X)
+            for (double i = deltaCoord.X; i <= (_gameOptionList + deltaCoord).X; i += _gridOptionList.X)
             {
-                //if ((deltaCoord.X >= rectangle.X) & (deltaCoord.X <= rectangle.X + rectangle.Width))
-                    _graph.DrawLine(pen, new Point((int) i, (int) deltaCoord.Y),
-                                         new Point((int) i, (int) (_gameOptionList.Y + deltaCoord.Y)));
-
+                _graph.DrawLine(pen, new Point((int)i, (int)deltaCoord.Y),
+                                      new Point((int)i, (int)(_gameOptionList + deltaCoord).Y));
             }
-            for (double i = deltaCoord.Y; i <= _gameOptionList.Y + deltaCoord.Y; i += _gridOptionList.Y)
+            for (double i = deltaCoord.Y; i <= (_gameOptionList + deltaCoord).Y; i += _gridOptionList.Y)
             {
-                //if ((deltaCoord.Y >= rectangle.Y) & (deltaCoord.Y <= rectangle.Y + rectangle.Height))
-                    _graph.DrawLine(pen, new Point((int) deltaCoord.X, (int) i),
-                        new Point((int) (_gameOptionList.X + deltaCoord.X), (int) i));
+                _graph.DrawLine(pen, new Point((int)deltaCoord.X, (int)i),
+                    new Point((int)(_gameOptionList + deltaCoord).X, (int)i));
             }
 
+        }
+
+        private void DrawAnimationRocket(Rectangle rectangle, Pen pen)
+        {
+            var baseRect1 = new Rectangle((int)_options.MyBattleFieldLocation.X - (int)_gridOptionList.X, (int)_options.MyBattleFieldLocation.Y - (int)_gridOptionList.Y, (int)_gameOptionList.X, (int)_gameOptionList.Y);
+            var baseRect2 = new Rectangle((int)_options.EnemyBattleFieldLocation.X, (int)_options.EnemyBattleFieldLocation.Y, (int)_gameOptionList.X, (int)_gameOptionList.Y);
+            if (baseRect1.Contains(rectangle) | baseRect2.Contains(rectangle))
+            {
+                var redrawX = (int)(Math.Truncate((rectangle.Location.X + rectangle.Width) / _gridOptionList.X) * _gridOptionList.X) - 10;
+                var redrawY = (int)(Math.Truncate((rectangle.Location.Y + rectangle.Height) / _gridOptionList.Y) * _gridOptionList.Y);
+                if (_bufRocketCoords.Equals(null))
+                {
+                    _bufRocketCoords = new Rectangle(redrawX, redrawY, rectangle.Width, rectangle.Height);
+                }
+                var currRocket = new Rectangle(redrawX, redrawY, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                if (!_bufRocketCoords.IntersectsWith(currRocket))
+                {
+                    //_graph.DrawRectangle(new Pen(Color.Blue, 2), rectangle);
+                    _graph.DrawRectangle(pen, _bufRocketCoords.X, _bufRocketCoords.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                    _bufRocketCoords = new Rectangle(redrawX, redrawY, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                }
+            }
         }
 
         public void DrawBattleFields(Rectangle rectangle)

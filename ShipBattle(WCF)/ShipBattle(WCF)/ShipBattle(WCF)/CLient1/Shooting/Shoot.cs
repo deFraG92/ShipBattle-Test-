@@ -64,14 +64,13 @@ namespace Shooting
             if (_counter < _trajectoryCoordsCollection.Count - 1)
             {
                 _baseControl.Invalidate(new Rectangle((int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y, (int)_options.RocketOption.X, (int)_options.RocketOption.Y), false);
-                _counter++; 
-                //Thread.Sleep(1000);
-               _graphic.DrawImage(_rocket.Fly(_trajectoryCoordsCollection[_counter]), (int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y);
-               
+                _counter++;
+                _graphic.DrawImage(_rocket.Fly(_trajectoryCoordsCollection[_counter]), (int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y);
             }
             else
             {
-                //_baseControl.Invalidate(new Rectangle((int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y, (int)_options.RocketOption.X, (int)_options.RocketOption.Y), false);
+                _baseControl.Invalidate(new Rectangle((int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y, (int)_options.RocketOption.X, (int)_options.RocketOption.Y), false);
+               // _baseControl.Refresh();
                 _timer.Dispose();
                 this.FireShootCompleted();
             }
