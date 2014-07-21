@@ -10,7 +10,6 @@ using System.Web;
 
 namespace Graphic
 {
-    // test com
     public class Drawing : IDrawing
     {
         private Graphics _graph;
