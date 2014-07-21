@@ -8,8 +8,6 @@ using GameUtils;
 
 namespace Graphic
 {
-    //second Comm
-    //third Comm
     public interface IDrawing 
     {
         void DrawBattleFields(Rectangle rectangle);
