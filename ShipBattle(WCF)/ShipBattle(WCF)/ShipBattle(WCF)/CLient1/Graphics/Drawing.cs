@@ -113,42 +113,51 @@ namespace Graphic
             return new Rectangle(deltaX, deltaY, (int)_gridOptionList.X, (int)_gridOptionList.Y);
         }
 
-        private List<Rectangle> ReturnRedrawRects(Rectangle rectangle)
+        private IEnumerable<Rectangle> ReturnRedrawRects(Rectangle rectangle)
         {
             bool first = false;
-            if (_bufRocketCoords.Equals(null))
+            try
             {
-                first = true;
-                _bufRocketCoords = new List<Rectangle>();
-
-            }
-            var rectangleHeadCoords = new List<Rectangle>();
-            rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X, rectangle.Y)));
-            rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X + rectangle.Width, rectangle.Y)));
-            rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height)));
-            rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X, rectangle.Y + rectangle.Height)));
-            rectangleHeadCoords.Distinct();
-            var redrawList = new List<Rectangle>();
-            if (!first)
-            {
-                redrawList = (from bufRocketCoord in _bufRocketCoords
-                    from rectangleHeadCoord in rectangleHeadCoords
-                    where !bufRocketCoord.Contains(rectangleHeadCoord)
-                    select bufRocketCoord).ToList();
-            }
-            foreach (var rectangleHeadCoord in
-                    rectangleHeadCoords.Where(rectangleHeadCoord => !_bufRocketCoords.Contains(rectangleHeadCoord)))
-            {
-                _bufRocketCoords.Add(rectangleHeadCoord);
-            }
-            if (!first)
-            {
-                foreach (var item in redrawList.Where(item => _bufRocketCoords.Contains(item)))
+                if (_bufRocketCoords == null)
                 {
-                    _bufRocketCoords.Remove(item);
+                    first = true;
+                    _bufRocketCoords = new List<Rectangle>();
+
                 }
+                var rectangleHeadCoords = new List<Rectangle>();
+                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X, rectangle.Y)));
+                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X + rectangle.Width, rectangle.Y)));
+                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height)));
+                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X, rectangle.Y + rectangle.Height)));
+                rectangleHeadCoords = new List<Rectangle>(rectangleHeadCoords.Distinct());
+                var redrawList = new List<Rectangle>();
+                if (!first)
+                {
+                    redrawList = (from bufRocketCoord in _bufRocketCoords
+                                  from rectangleHeadCoord in rectangleHeadCoords
+                                  where !bufRocketCoord.Contains(rectangleHeadCoord)
+                                  select bufRocketCoord).ToList();
+                }
+                foreach (var rectangleHeadCoord in
+                        rectangleHeadCoords.Where(rectangleHeadCoord => !_bufRocketCoords.Contains(rectangleHeadCoord)))
+                {
+                    _bufRocketCoords.Add(rectangleHeadCoord);
+                }
+                if (!first)
+                {
+                    foreach (var item in redrawList.Where(item => _bufRocketCoords.Contains(item)))
+                    {
+                        _bufRocketCoords.Remove(item);
+                    }
+                }
+                return redrawList;
             }
-            return redrawList;
+            catch (Exception e)
+            {
+                //MessageBox.Show(e.ToString());
+                return null;
+            }
+            
         }
 
 
@@ -158,12 +167,10 @@ namespace Graphic
             var baseRect2 = new Rectangle((int)_options.EnemyBattleFieldLocation.X, (int)_options.EnemyBattleFieldLocation.Y, (int)_gameOptionList.X, (int)_gameOptionList.Y);
             if (baseRect1.Contains(rectangle) | baseRect2.Contains(rectangle))
             {
-                if (_bufRocketCoords.Equals(null))
+                foreach (var rect in ReturnRedrawRects(rectangle))
                 {
-                    _bufRocketCoords = new List<Rectangle>();
+                    _graph.DrawRectangle(pen, rect.X, rect.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
                 }
-
-
             }
         }
 

@@ -70,7 +70,6 @@ namespace ClientsPart
 
         private void Field_Paint(object sender, PaintEventArgs e)
         {
-
             _controller.Redraw(e.ClipRectangle);
             //if (e.ClipRectangle.Location.X != 0)
             //{
@@ -79,7 +78,6 @@ namespace ClientsPart
             //                 e.ClipRectangle.Location.Y.ToString() +
             //                 " ); ";
             //}
-            
         }
         
 
