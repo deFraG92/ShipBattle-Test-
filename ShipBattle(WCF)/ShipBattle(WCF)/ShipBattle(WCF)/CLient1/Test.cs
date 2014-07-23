@@ -24,6 +24,7 @@ namespace ClientsPart
             this.myEvent += new MyEvent(UserInterface_myEvent);
         }
         //Test
+        //Lol
         private Shoot _shoot;
         private List<Image> _imgCollection;
         private void button1_Click(object sender, EventArgs e)
