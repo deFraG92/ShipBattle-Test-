@@ -17,7 +17,6 @@ namespace ClientsPart
 
     public sealed partial class UserInterface : Form
     {
-        //Test commit for Test branch
         public UserInterface()
         {
             InitializeComponent();
