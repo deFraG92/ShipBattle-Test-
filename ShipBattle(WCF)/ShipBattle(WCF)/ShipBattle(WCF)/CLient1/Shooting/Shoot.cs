@@ -47,7 +47,7 @@ namespace Shooting
         private void DrawAnimationShoot()
         {
             _graphic = _baseControl.CreateGraphics();
-            _timer = new Timer(new TimerCallback(Shoot_OnTick), null, 0, 100);
+            _timer = new Timer(new TimerCallback(Shoot_OnTick), null, 0, 1000);
         }
 
         private void FireShootCompleted()

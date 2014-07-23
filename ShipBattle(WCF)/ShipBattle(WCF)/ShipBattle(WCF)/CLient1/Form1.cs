@@ -55,14 +55,13 @@ namespace ClientsPart
                 ShipTurnCMB.Enabled = false;
                 ShipTypeCMB.Enabled = false;
             }
+
             //var graph = this.CreateGraphics();
             //var rect1 = new Rectangle(100, 100, 50, 50);
-            //var rect2 = new Rectangle(100, 100, 50, 50);
-            //graph.DrawRectangle(new Pen(Color.Red, 2), rect1);
-            //graph.DrawRectangle(new Pen(Color.Transparent, 2), rect2);
-            //var rect3 = Rectangle.Intersect(rect1, rect2).;
-            //rect3.Location = new Point(200, 200);
-            //graph.DrawRectangle(new Pen(Color.Red, 2), rect3);
+            //var rect2 = new Rectangle(125, 100, 50, 50);
+            //var rect3 = Rectangle.Intersect(rect1, rect2);
+            //graph.DrawRectangle(new Pen(Color.Red, 3) , rect3);
+            
             
 
         }

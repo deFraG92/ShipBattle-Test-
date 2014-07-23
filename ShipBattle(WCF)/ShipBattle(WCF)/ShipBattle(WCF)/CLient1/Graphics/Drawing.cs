@@ -160,7 +160,7 @@ namespace Graphic
             
         }
 
-
+        private int _counter = 0;
         private void DrawAnimationRocket(Rectangle rectangle, Pen pen)
         {
             var baseRect1 = new Rectangle((int)_options.MyBattleFieldLocation.X, (int)_options.MyBattleFieldLocation.Y, (int)_gameOptionList.X, (int)_gameOptionList.Y);
@@ -170,7 +170,12 @@ namespace Graphic
                 foreach (var rect in ReturnRedrawRects(rectangle))
                 {
                     _graph.DrawRectangle(pen, rect.X, rect.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                    //_graph.DrawRectangle(new Pen(Color.Blue, 2), rect.X, rect.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                    //var testpen = new Pen(Color.FromArgb(0, 0, _counter));
+                    //_graph.DrawRectangle(testpen, rect.X, rect.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                   
                 }
+                _counter += 10;
             }
         }
 
