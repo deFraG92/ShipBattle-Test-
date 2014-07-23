@@ -17,6 +17,7 @@ namespace ClientsPart
 
     public sealed partial class UserInterface : Form
     {
+        // Once more comment
         public UserInterface()
         {
             InitializeComponent();
