@@ -12,7 +12,7 @@ namespace Engine
         List<Coordinates> GetShipImage();
         void RotateShip();
         List<Coordinates> DeleteShip(Coordinates coord);
-        Coordinates HitTheShip(Coordinates coord, string Uid, out bool hit, out bool IsDestroy);
+        Coordinates HitTheShip(Coordinates coord, string uid, out bool hit, out bool IsDestroy);
         List<Coordinates> DestroyShipsCoords(Coordinates coord, string uid);
     }
 }

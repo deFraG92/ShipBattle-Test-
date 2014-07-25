@@ -9,7 +9,7 @@ namespace ClientsPart
 {
     public class GameContractCallback : IGameContractCallback
     {
-        private IGame _game;
+        private readonly IGame _game;
         public GameContractCallback(IGame game)
         {
             _game = game;

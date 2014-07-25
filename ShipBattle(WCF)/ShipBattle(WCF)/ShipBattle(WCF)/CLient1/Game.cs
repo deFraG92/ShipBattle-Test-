@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 using System.Text;
+using ClientWithForm.Shooting;
 using GameUtils;
 using System.ServiceModel;
 using Graphic;
-using Shooting;
-using System.IO;
 using System.Windows.Forms;
-using System.Threading;
 
 
 namespace ClientsPart
@@ -50,12 +48,11 @@ namespace ClientsPart
         public void SetAnimationControl(Control animationControl)
         {
             _animationControl = animationControl;
-        
         }
 
         public bool ConnectToService()
         {
-            string uri = _options.Uri;
+            var uri = _options.Uri;
             var address = new Uri("net.tcp://" + uri + "/IGameContract");
             var bind = new NetTcpBinding();
             
@@ -79,7 +76,7 @@ namespace ClientsPart
         {
             if (_isConnected)
             {
-                int playerCounter = (int)_contract.GetPlayerUid();
+                var playerCounter = (int)_contract.GetPlayerUid();
                 if (playerCounter > 0)
                 {
                     _uid += playerCounter.ToString();
@@ -157,7 +154,7 @@ namespace ClientsPart
             //{ 
             //    _imgCollection.Add(Image.FromFile(fileName));
             //}
-            string direction = "FromLeftToRight";
+            var direction = "FromLeftToRight";
             if (!reverse)
             {
                 if (_uid == "Client2")
@@ -168,7 +165,7 @@ namespace ClientsPart
                 if (_uid == "Client1")
                     direction = "FromRightToLeft";
             }
-            this._isShootAnimated = true;
+            _isShootAnimated = true;
             _shoot = new AnimationShootOnBaseControl(_rocketImg, _rocketImg, _animationControl, _options);
             _shoot.MakeShoot(start, destination, direction);
             _shoot.ShootCompleted += () => { this._isShootAnimated = false; };
@@ -187,17 +184,17 @@ namespace ClientsPart
 
         public void HitTheShip(Coordinates shipCoord)
         {
-            if ( (_isConnected) & (_uid != "Client") )
+            if ((_isConnected) & (_uid != "Client"))
             {
-                bool hit = false;
-                bool isDestroy = false;
-                Coordinates start = SeedRandStartCoord();
+                var hit = false;
+                var isDestroy = false;
+                var start = SeedRandStartCoord();
                 var hitCoord = _contract.HitTheShip(shipCoord, _uid, out hit, out isDestroy);
                 AnimatedShooting(start, shipCoord);
                 if (isDestroy == false)
                 {
                     //Thread.Sleep(100);
-                    //_drawShips.DrawHitShip(hitCoord[0], hit);
+                    ///_drawShips.DrawHitShip(hitCoord[0], hit);
                     _gameContext.UpdateOnHitShipCoords(hitCoord[0], hit, false);
                     _contract.UpdateContext(ShipAction.HitTheShip);
                 }
@@ -246,12 +243,23 @@ namespace ClientsPart
             }
         }
 
+        private void DrawCompleted()
+        {
+            //var handler = ;
+            //if (handler != null)
+            //{
+            //    handler();
+            //}
+        }
+
         public void ReDraw(Rectangle rectangle)
         {
-            if (!this._isShootAnimated)
+            if (!_isShootAnimated)
             {
                 rectangle = Rectangle.Empty;
             }
+
+
             _drawShips.DrawBattleFields(rectangle);
             _drawShips.DrawShip(_gameContext.ShipCoords, ShipAction.CreateShip);
             //DrawHitShip(_gameContext.MyHitCoords);
