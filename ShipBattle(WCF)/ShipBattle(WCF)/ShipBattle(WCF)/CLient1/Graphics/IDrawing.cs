@@ -15,5 +15,6 @@ namespace Graphic
         void EraseShip(List<Coordinates> deleteShipCoords);
         void DrawHitShip(Coordinates hitCoord, bool hit);
         void DrawDestroyShip(List<Coordinates> destroyShipCoords);
+        //Action DrawCompleted();
     }
 }

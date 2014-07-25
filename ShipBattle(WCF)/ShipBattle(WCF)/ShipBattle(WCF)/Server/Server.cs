@@ -12,10 +12,10 @@ namespace GameServer
         static void Main(string[] args)
         {
             Console.Title = "Server";
-            Uri address = new Uri("net.tcp://localhost:8080/IGameContract");
-            NetTcpBinding bind = new NetTcpBinding();
-            Type contract = typeof(IGameContract);
-            ServiceHost host = new ServiceHost(typeof(GameContract));
+            var address = new Uri("net.tcp://localhost:8080/IGameContract");
+            var bind = new NetTcpBinding();
+            var contract = typeof(IGameContract);
+            var host = new ServiceHost(typeof(GameContract));
             host.AddServiceEndpoint(contract, bind, address);
             host.Open();
             Console.WriteLine("Сервер запущен");

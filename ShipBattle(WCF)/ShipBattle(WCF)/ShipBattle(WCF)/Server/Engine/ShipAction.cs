@@ -9,93 +9,51 @@ namespace Engine
 
     public class ShipAction : IShipAction
     {
-        public ShipAction(string ShipType, string shipTurning, string Uid)
+        public ShipAction(string shipType, string shipTurning, string uid)
         {
-            this._uid = Uid;
-            Type shipType = Type.GetType("Engine." + ShipType);
-            this._ship = (Ship)Activator.CreateInstance(shipType);
-            this._shipTurning = shipTurning;
+            _uid = uid;
+            var shipT = Type.GetType("Engine." + shipType);
+            if (shipT != null)
+                _ship = (Ship)Activator.CreateInstance(shipT);
+            _shipTurning = shipTurning;
         }
         
         public void RotateShip()
         {
-            int Buf = this._ship.ColCount;
-            this._ship.ColCount = this._ship.RowCount;
-            this._ship.RowCount = Buf;
+            var buf = _ship.ColCount;
+            _ship.ColCount = _ship.RowCount;
+            _ship.RowCount = buf;
             
         }
 
         public List<Coordinates> DeleteShip(Coordinates coord)
         {
-            Coordinates RoundCoord = RoundCoords(coord, _uid);
-            int counter = 0;
+            var roundCoords = RoundCoords(coord, _uid);
+            var counter = 0;
 
-            foreach (var Ship in _bufList[this._uid])
+            foreach (var ship in _bufList[_uid])
             {
-                if (Ship.Contains(RoundCoord))
+                if (ship.Contains(roundCoords))
                 {
-                    _bufList[this._uid].RemoveAt(counter);
+                    _bufList[_uid].RemoveAt(counter);
                     break;
                 }
                 counter++;
             }
 
-            foreach (var Ship in _shipCoords[this._uid])
+            foreach (var ship in _shipCoords[_uid])
             {
-                if (Ship.Contains(RoundCoord))
+                if (ship.Contains(roundCoords))
                 {
-                    _shipCoords[this._uid].Remove(Ship);
-                    return Ship;
+                    _shipCoords[_uid].Remove(ship);
+                    return ship;
                 }
 
             }
             return null;
         }
 
-        private bool CheckList(Coordinates shipCoords)
-        {
-            if (
-                  (shipCoords.X <= _gameOptionCoords[_uid].X - _gridOptionCoords[_uid].X + _deltaCoords[_uid].X) // up border
-                & (shipCoords.Y <= _gameOptionCoords[_uid].Y - _gridOptionCoords[_uid].Y + _deltaCoords[_uid].Y) // down border
-                & (shipCoords.X >= _deltaCoords[_uid].X) // left border
-                & (shipCoords.Y >= _deltaCoords[_uid].Y) // right border
-               )
 
-            {
-                if (_shipCoords.ContainsKey(this._uid))
-                {
-                    foreach (var List in _bufList[this._uid])
-                    {
-                        if (
-                                List.Contains(shipCoords)
-                              | List.Contains(new Coordinates(shipCoords.X + _gridOptionCoords[_uid].X, shipCoords.Y))
-                              | List.Contains(new Coordinates(shipCoords.X, shipCoords.Y + _gridOptionCoords[_uid].Y))
-                              | List.Contains(new Coordinates(shipCoords.X + _gridOptionCoords[_uid].X, shipCoords.Y + _gridOptionCoords[_uid].Y))
-                             )
-                        {
-                            return true;
-                        }
-
-                    }
-                    return false;
-
-                }
-                else
-                    return false;
-            }
-            else
-                return true;
-        }
-
-        private Coordinates RoundCoords(Coordinates coord, string uid)
-        {
-            Coordinates roundCoord = new Coordinates();
-            double x = Math.Truncate((coord.X - _deltaCoords[uid].X) / _gridOptionCoords[uid].X);
-            double y = Math.Truncate((coord.Y - _deltaCoords[uid].Y) / _gridOptionCoords[uid].Y);
-            roundCoord.X = _deltaCoords[uid].X + x * _gridOptionCoords[uid].X;
-            roundCoord.Y = _deltaCoords[uid].Y + y * _gridOptionCoords[uid].Y;
-            return roundCoord;
-        }
 
         //public int[] GetShipLength()
         //{
@@ -109,10 +67,180 @@ namespace Engine
         //    return null;
         //}
 
+        
+
+        public List<Coordinates> GetShipImage()
+        {
+            if (this._ship != null)
+            {
+                var rowCount = _ship.RowCount;
+                var colCount = _ship.ColCount;
+                var shipImageList = new List<Coordinates>();
+                var shipImageCoords = new Coordinates();
+                for (int j = 0; j < colCount; j++)
+                {
+                    for (int i = 0; i < rowCount; i++)
+                    {
+                        if (this._ship.GetShipList()[i * colCount + j] == 1)
+                        {
+                            shipImageCoords.X = shipImageCoords.X + j * _gridOptionCoords[_uid].X;
+                            shipImageCoords.Y = shipImageCoords.Y + i * _gridOptionCoords[_uid].Y;
+                            shipImageList.Add(shipImageCoords);
+                        }
+                    }
+                }
+                return shipImageList;
+            }
+            return null;
+        }
+
+        public List<Coordinates> CreateShip(Coordinates coord)
+        {
+            if (_shipCoords.ContainsKey(this._uid) )
+            {
+                if ( _shipCoords[this._uid].Count >= _shipsCount[_uid] )
+                    return null;
+            }
+            var shipCoords = new Coordinates();
+            var roundCoord = RoundCoords(coord, _uid);
+            shipCoords.X = roundCoord.X;
+            shipCoords.Y = roundCoord.Y;
+            var listOfShipCoords = new List<Coordinates>();
+            var rowCount = this._ship.RowCount;
+            var colCount = this._ship.ColCount;
+
+            for (var j = 0; j < colCount; j++)
+            {
+                for (var i = 0; i < rowCount; i++)
+                {
+                    if (_ship.GetShipList()[i * colCount + j] == 1)
+                    {
+                        shipCoords.X = shipCoords.X + j * _gridOptionCoords[_uid].X;
+                        shipCoords.Y = shipCoords.Y + i * _gridOptionCoords[_uid].Y;
+
+                        if (!this.CheckList(shipCoords))
+                        {
+                            listOfShipCoords.Add(shipCoords);
+                            shipCoords.X = roundCoord.X;
+                            shipCoords.Y = roundCoord.Y;
+                        }
+                        else
+                        {
+                            listOfShipCoords.Clear();
+                            colCount = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (listOfShipCoords.Count > 0)
+            {
+                FillBuffList(listOfShipCoords);
+                if (!_shipCoords.ContainsKey(this._uid))
+                {
+                    var newShip = new List<List<Coordinates>>();
+                    newShip.Add(listOfShipCoords);
+                    _shipCoords.Add(this._uid, newShip);
+                }
+                else
+                    _shipCoords[this._uid].Add(listOfShipCoords);
+                return listOfShipCoords;
+            }
+            return null;
+        }
+
+        public Coordinates HitTheShip(Coordinates coord, string uid, out bool hit, out bool isDestroy)
+        {
+            isDestroy = false;
+            hit = false;
+            var roundCoords = new Coordinates(0, 0);
+            foreach (var ship in _shipCoords)
+            {
+                if (ship.Key != uid)
+                {
+                    roundCoords = RoundCoords(coord, ship.Key); 
+                    foreach (var list in ship.Value)
+                    {
+                        if (list.Contains(roundCoords))
+                        {
+                            hit = true;
+                            list.Remove(roundCoords);
+                            if (list.Count == 0)
+                            {
+                                isDestroy = true;
+                                ship.Value.Remove(list);
+                            }
+                            return roundCoords;
+                        }
+                    }
+                }
+            }
+            return roundCoords;
+        }
+
+        public List<Coordinates> DestroyShipsCoords(Coordinates coord, string uid)
+        {
+            foreach (var destroyShip in _forDestroyShips)
+            {
+                if (destroyShip.Key != uid)
+                {
+                    Coordinates roundCoords = RoundCoords(coord, destroyShip.Key);
+                    foreach (var ship in destroyShip.Value)
+                    {
+                        if (ship.Contains(roundCoords))
+                            return ship;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private bool CheckList(Coordinates shipCoords)
+        {
+            if (
+                  (shipCoords.X <= _gameOptionCoords[_uid].X - _gridOptionCoords[_uid].X + _deltaCoords[_uid].X) // up border
+                & (shipCoords.Y <= _gameOptionCoords[_uid].Y - _gridOptionCoords[_uid].Y + _deltaCoords[_uid].Y) // down border
+                & (shipCoords.X >= _deltaCoords[_uid].X) // left border
+                & (shipCoords.Y >= _deltaCoords[_uid].Y) // right border
+               )
+            {
+                if (_shipCoords.ContainsKey(_uid))
+                {
+                    foreach (var list in _bufList[_uid])
+                    {
+                        if (
+                                list.Contains(shipCoords)
+                              | list.Contains(new Coordinates(shipCoords.X + _gridOptionCoords[_uid].X, shipCoords.Y))
+                              | list.Contains(new Coordinates(shipCoords.X, shipCoords.Y + _gridOptionCoords[_uid].Y))
+                              | list.Contains(new Coordinates(shipCoords.X + _gridOptionCoords[_uid].X, shipCoords.Y + _gridOptionCoords[_uid].Y))
+                             )
+                        {
+                            return true;
+                        }
+
+                    }
+                    return false;
+
+                }
+                return false;
+            }
+            return true;
+        }
+
+        private Coordinates RoundCoords(Coordinates coord, string uid)
+        {
+            var roundCoord = new Coordinates();
+            var x = Math.Truncate((coord.X - _deltaCoords[uid].X) / _gridOptionCoords[uid].X);
+            var y = Math.Truncate((coord.Y - _deltaCoords[uid].Y) / _gridOptionCoords[uid].Y);
+            roundCoord.X = _deltaCoords[uid].X + x * _gridOptionCoords[uid].X;
+            roundCoord.Y = _deltaCoords[uid].Y + y * _gridOptionCoords[uid].Y;
+            return roundCoord;
+        }
+
         private void FillBuffList(List<Coordinates> coords)
         {
-            
-            int counter = 0;
+
+            var counter = 0;
             var dict = new List<List<Coordinates>>();
             if (!_bufList.ContainsKey(this._uid))
             {
@@ -148,134 +276,8 @@ namespace Engine
             }
             _bufList[this._uid].Add(myList);
         }
-
-        public List<Coordinates> GetShipImage()
-        {
-            if (this._ship != null)
-            {
-                int RowCount = this._ship.RowCount;
-                int ColCount = this._ship.ColCount;
-                var shipImageList = new List<Coordinates>();
-                var shipImageCoords = new Coordinates();
-                for (int j = 0; j < ColCount; j++)
-                {
-                    for (int i = 0; i < RowCount; i++)
-                    {
-                        if (this._ship.GetShipList()[i * ColCount + j] == 1)
-                        {
-                            shipImageCoords.X = shipImageCoords.X + j * _gridOptionCoords[this._uid].X;
-                            shipImageCoords.Y = shipImageCoords.Y + i * _gridOptionCoords[this._uid].Y;
-                            shipImageList.Add(shipImageCoords);
-                        }
-                    }
-                }
-                return shipImageList;
-            }
-            return null;
-        }
-
-        public List<Coordinates> CreateShip(Coordinates coord)
-        {
-            if (_shipCoords.ContainsKey(this._uid) )
-            {
-                if ( _shipCoords[this._uid].Count >= _shipsCount[this._uid] )
-                    return null;
-            }
-            Coordinates ShipCoords = new Coordinates();
-            Coordinates RoundCoord = RoundCoords(coord, _uid);
-            ShipCoords.X = RoundCoord.X;
-            ShipCoords.Y = RoundCoord.Y;
-            var ListOfShipCoords = new List<Coordinates>();
-            int RowCount = this._ship.RowCount;
-            int ColCount = this._ship.ColCount;
-
-            for (int j = 0; j < ColCount; j++)
-            {
-                for (int i = 0; i < RowCount; i++)
-                {
-                    if (this._ship.GetShipList()[i * ColCount + j] == 1)
-                    {
-                        ShipCoords.X = ShipCoords.X + j * _gridOptionCoords[this._uid].X;
-                        ShipCoords.Y = ShipCoords.Y + i * _gridOptionCoords[this._uid].Y;
-
-                        if (!this.CheckList(ShipCoords))
-                        {
-                            ListOfShipCoords.Add(ShipCoords);
-                            ShipCoords.X = RoundCoord.X;
-                            ShipCoords.Y = RoundCoord.Y;
-                        }
-                        else
-                        {
-                            ListOfShipCoords.Clear();
-                            ColCount = 0;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (ListOfShipCoords.Count > 0)
-            {
-                this.FillBuffList(ListOfShipCoords);
-                if (!_shipCoords.ContainsKey(this._uid))
-                {
-                    var NewShip = new List<List<Coordinates>>();
-                    NewShip.Add(ListOfShipCoords);
-                    _shipCoords.Add(this._uid, NewShip);
-                }
-                else
-                    _shipCoords[this._uid].Add(ListOfShipCoords);
-                return ListOfShipCoords;
-            }
-            return null;
-        }
-
-        public Coordinates HitTheShip(Coordinates coord, string Uid, out bool hit, out bool isDestroy)
-        {
-            isDestroy = false;
-            hit = false;
-            var roundCoords = new Coordinates(0, 0);
-            foreach (var ship in _shipCoords)
-            {
-                if (ship.Key != Uid)
-                {
-                    roundCoords = RoundCoords(coord, ship.Key); 
-                    foreach (var List in ship.Value)
-                    {
-                        if (List.Contains(roundCoords))
-                        {
-                            hit = true;
-                            List.Remove(roundCoords);
-                            if (List.Count == 0)
-                            {
-                                isDestroy = true;
-                                ship.Value.Remove(List);
-                            }
-                            return roundCoords;
-                        }
-                    }
-                }
-            }
-            return roundCoords;
-        }
-
-        public List<Coordinates> DestroyShipsCoords(Coordinates coord, string uid)
-        {
-            
-            foreach (var Ship in _forDestroyShips)
-            {
-                if (Ship.Key != uid)
-                {
-                    Coordinates roundCoords = RoundCoords(coord, Ship.Key);
-                    foreach (var ship in Ship.Value)
-                    {
-                        if (ship.Contains(roundCoords))
-                            return ship;
-                    }
-                }
-            }
-            return null;
-        }
-
+        // REMAKE THIS!!!
+        #region
         private string _shipTurning;
         private string _uid;
         private Ship _ship;
@@ -284,7 +286,7 @@ namespace Engine
         private static Dictionary<string, List<List<Coordinates>>> _shipCoords = new Dictionary<string, List<List<Coordinates>>>();
 
 
-        private static Dictionary<string, int> _shipsCount = new Dictionary<string,int>();
+        private readonly static Dictionary<string, int> _shipsCount = new Dictionary<string, int>();
         public static void SetShipsCount(string uid, int shipsCount)
         {
             if (!_shipsCount.ContainsKey(uid))
@@ -292,7 +294,7 @@ namespace Engine
             else
                 _shipsCount[uid] = shipsCount;
         }
-        private static Dictionary<string, Coordinates> _gameOptionCoords = new Dictionary<string, Coordinates>();
+        private readonly static Dictionary<string, Coordinates> _gameOptionCoords = new Dictionary<string, Coordinates>();
         public static void SetGameOptionCoords(string uid, Coordinates gameCoords)
         {
             if (!_gameOptionCoords.ContainsKey(uid))
@@ -300,7 +302,7 @@ namespace Engine
             else
                 _gameOptionCoords[uid] = gameCoords;
         }
-        private static Dictionary<string, Coordinates> _gridOptionCoords = new Dictionary<string, Coordinates>();
+        private readonly static Dictionary<string, Coordinates> _gridOptionCoords = new Dictionary<string, Coordinates>();
         public static void SetGridOptionCoords(string uid, Coordinates gridCoords)
         {
             if (!_gridOptionCoords.ContainsKey(uid))
@@ -326,7 +328,7 @@ namespace Engine
                 }
             }
         }
-        private static Dictionary<string, Coordinates> _deltaCoords = new Dictionary<string, Coordinates>();
+        private readonly static Dictionary<string, Coordinates> _deltaCoords = new Dictionary<string, Coordinates>();
         public static void SetDeltaCoords(string uid, Coordinates deltaCoords)
         {
             if (!_deltaCoords.ContainsKey(uid))
@@ -334,6 +336,7 @@ namespace Engine
             else
                 _deltaCoords[uid] = deltaCoords;
         }
-        
+        #endregion
+        //////////////////////
     }
 }

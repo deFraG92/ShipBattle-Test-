@@ -9,10 +9,9 @@ namespace Shooting
 {
     public abstract class Rocket
     {
-        //public abstract void Fly(Coordinates startCoords, Coordinates destination);
-        protected Trajectory _trajectory;
-        protected ImageHandler _imgRocketHandler;
-        protected ImageHandler _imgBangHandler;
+        protected Trajectory Trajectory;
+        protected ImageHandler ImgRocketHandler;
+        protected ImageHandler ImgBangHandler;
         public abstract List<Coordinates> InitTrajectory(Coordinates startCoords, Coordinates destination, string direction = "FromLeftToRight");
         public abstract Image Fly(Coordinates rocketCoord);
         public abstract Image BangBang(object target);
@@ -20,25 +19,25 @@ namespace Shooting
 
     public class RocketPrototype1 : Rocket
     {
-        public RocketPrototype1(List<Image> rocketImgCollection, List<Image> bangImgCollection, Coordinates pictureSettings)
+        public RocketPrototype1(IEnumerable<Image> rocketImgCollection, IEnumerable<Image> bangImgCollection, Coordinates pictureSettings)
         {
-            _imgRocketHandler = new ImageHandler();
+            ImgRocketHandler = new ImageHandler();
             foreach (var img in rocketImgCollection)
             {
-                _imgRocketHandler.AddImage(new Bitmap(img, (int)pictureSettings.X, (int)pictureSettings.Y));
+                ImgRocketHandler.AddImage(new Bitmap(img, (int)pictureSettings.X, (int)pictureSettings.Y));
             }
-            _imgBangHandler = new ImageHandler();
+            ImgBangHandler = new ImageHandler();
             foreach (var img in bangImgCollection)
             {
-                _imgBangHandler.AddImage(new Bitmap(img, (int)pictureSettings.X, (int)pictureSettings.Y));
+                ImgBangHandler.AddImage(new Bitmap(img, (int)pictureSettings.X, (int)pictureSettings.Y));
             }
             
         }
 
         public override List<Coordinates> InitTrajectory(Coordinates startCoords, Coordinates destination, string direction = "FromLeftToRight")
         {
-           _trajectory = new BezjeTrajectory();
-            var pathCollection = (List<Coordinates>)_trajectory.GetTrajectory(new List<Coordinates> { 
+            Trajectory = new BezjeTrajectory();
+            var pathCollection = (List<Coordinates>)Trajectory.GetTrajectory(new List<Coordinates> { 
                                                                                                     startCoords,
                                                                                                     new Coordinates((startCoords.X + destination.X) / 2, 50),
                                                                                                     destination
@@ -48,10 +47,10 @@ namespace Shooting
 
         public override Image Fly(Coordinates rocketCoord)
         {
-            if ((_trajectory != null) & (_imgRocketHandler != null))
+            if ((Trajectory != null) & (ImgRocketHandler != null))
             {
-                double angle = _trajectory.GetAngleByCoord(rocketCoord);
-                return _imgRocketHandler.GetRotateImage(_imgRocketHandler.GetImageByIndex(0), angle);
+                double angle = Trajectory.GetAngleByCoord(rocketCoord);
+                return ImgRocketHandler.GetRotateImage(ImgRocketHandler.GetImageByIndex(0), angle);
             }
             else
                 throw new Exception("Fly");
@@ -59,7 +58,7 @@ namespace Shooting
 
         public override Image BangBang(object target)
         {
-            return _imgBangHandler.GetImageByIndex((int)target);
+            return ImgBangHandler.GetImageByIndex((int)target);
         }
     }
 }

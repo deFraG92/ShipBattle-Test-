@@ -5,41 +5,42 @@ using System.Text;
 using System.Drawing;
 using GameUtils;
 using System.Threading;
+using Shooting;
 using GameOptions = ClientsPart.GameOptions;
 using Timer = System.Threading.Timer;
 using System.Windows.Forms;
 
-namespace Shooting
+namespace ClientWithForm.Shooting
 {
     public abstract class Shoot
     {
-        protected Rocket _rocket;
-        protected Timer _timer;
-        protected string _direction = "FromLeftToRight";
+        protected Rocket Rocket;
+        protected Timer Timer;
+        protected string Direction = "FromLeftToRight";
         public Action ShootCompleted;
         public abstract void MakeShoot(Coordinates startShoot, Coordinates destination, string direction = "FromLeftToRight");
     }
 
     public class AnimationShootOnBaseControl : Shoot
     {
-        private Control _baseControl;
+        private readonly Control _baseControl;
         private List<Coordinates> _trajectoryCoordsCollection;
-        private GameOptions _options;
+        private readonly GameOptions _options;
         private int _counter = 0;
-        private Graphics _graphic;
-        public AnimationShootOnBaseControl(List<Image> rocketImgCollection,
-                          List<Image> bangImgCollection,
+        private System.Drawing.Graphics _graphic;
+        public AnimationShootOnBaseControl(IEnumerable<Image> rocketImgCollection,
+                          IEnumerable<Image> bangImgCollection,
                           Control baseControl,
                           GameOptions options)
         {
-            _rocket = new RocketPrototype1(rocketImgCollection, bangImgCollection, options.RocketOption);
+            Rocket = new RocketPrototype1(rocketImgCollection, bangImgCollection, options.RocketOption);
             _baseControl = baseControl;
             _options = options;
         }
 
         public override void MakeShoot(Coordinates startShoot, Coordinates destination, string direction = "FromLeftToRight")
         {
-            _trajectoryCoordsCollection = _rocket.InitTrajectory(startShoot, destination, direction);
+            _trajectoryCoordsCollection = Rocket.InitTrajectory(startShoot, destination, direction);
             //DrawShoot();
             DrawAnimationShoot();
         }
@@ -47,7 +48,7 @@ namespace Shooting
         private void DrawAnimationShoot()
         {
             _graphic = _baseControl.CreateGraphics();
-            _timer = new Timer(new TimerCallback(Shoot_OnTick), null, 0, 1000);
+            Timer = new Timer(new TimerCallback(Shoot_OnTick), null, 0, 100);
         }
 
         private void FireShootCompleted()
@@ -65,14 +66,13 @@ namespace Shooting
             {
                 _baseControl.Invalidate(new Rectangle((int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y, (int)_options.RocketOption.X, (int)_options.RocketOption.Y), false);
                 _counter++;
-                _graphic.DrawImage(_rocket.Fly(_trajectoryCoordsCollection[_counter]), (int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y);
+                _graphic.DrawImage(Rocket.Fly(_trajectoryCoordsCollection[_counter]), (int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y);
             }
             else
             {
-                _baseControl.Invalidate(new Rectangle((int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y, (int)_options.RocketOption.X, (int)_options.RocketOption.Y), false);
-               // _baseControl.Refresh();
-                _timer.Dispose();
-                this.FireShootCompleted();
+                //_baseControl.Invalidate(new Rectangle((int)_trajectoryCoordsCollection[_counter].X, (int)_trajectoryCoordsCollection[_counter].Y, (int)_options.RocketOption.X, (int)_options.RocketOption.Y), false);
+                Timer.Dispose();
+                FireShootCompleted();
             }
         
         }
@@ -82,7 +82,7 @@ namespace Shooting
             var graphic = _baseControl.CreateGraphics();
             foreach (var coord in _trajectoryCoordsCollection)
             {
-                graphic.DrawImage(_rocket.Fly(coord), (int)coord.X, (int)coord.Y);
+                graphic.DrawImage(Rocket.Fly(coord), (int)coord.X, (int)coord.Y);
             }
             
         }
@@ -91,19 +91,19 @@ namespace Shooting
     public class AnimationShootOnSomeControls : Shoot // Not finished realization
     {
         private List<Coordinates> _trajectoryCoordsCollection;
-        private GameOptions _options;
+        private readonly GameOptions _options;
         private List<Control> _controlCollection;
-        private Control _baseControl;
+        private readonly Control _baseControl;
         private List<int> _trajectoryPartitionCollection;
         private int _counter = 0;
-        public AnimationShootOnSomeControls(List<Image> rocketImgCollection,
-                          List<Image> bangImgCollection, 
-                          List<Control> controlCollection, 
+        public AnimationShootOnSomeControls(IEnumerable<Image> rocketImgCollection,
+                          IEnumerable<Image> bangImgCollection, 
+                          IEnumerable<Control> controlCollection, 
                           Control baseControl,
                           GameOptions options)
         {
             
-            _rocket = new RocketPrototype1(rocketImgCollection, bangImgCollection, options.RocketOption);
+            Rocket = new RocketPrototype1(rocketImgCollection, bangImgCollection, options.RocketOption);
             _controlCollection = new List<Control>(controlCollection);
             _baseControl = baseControl;
             _options = options;
@@ -113,10 +113,10 @@ namespace Shooting
         {
             if (uid == "Client2")
             {
-                _direction = "FromRightToLeft";
+                Direction = "FromRightToLeft";
             }
             var newCoords = ToFormCoordTransForm(startShoot, destination);
-            _trajectoryCoordsCollection = _rocket.InitTrajectory(newCoords[0], newCoords[1], _direction);
+            _trajectoryCoordsCollection = Rocket.InitTrajectory(newCoords[0], newCoords[1], Direction);
             ChooseControl();
             Draw();
             //_timer = new Timer(new TimerCallback(DrawShoot), null, 0, 100);
@@ -137,11 +137,11 @@ namespace Shooting
         {
             if (_counter == 17)
             {
-                _timer.Dispose();
+                Timer.Dispose();
                 return;
             }
             var bangCoords = _trajectoryCoordsCollection[_trajectoryCoordsCollection.Count - 1];
-            //_graphCollection[0].DrawImage(_rocket.BangBang(_counter), (int)bangCoords.X, (int)bangCoords.Y);
+            //_graphCollection[0].DrawImage(Rocket.BangBang(_counter), (int)bangCoords.X, (int)bangCoords.Y);
             Thread.Sleep(100);
            //_drawForm.Invalidate(new Rectangle((int)bangCoords.X, (int)bangCoords.Y, 20, 20));
            _counter++;
@@ -164,24 +164,20 @@ namespace Shooting
             location.Y = (double)control.Location.Y;
             size.X = (double)control.Size.Width;
             size.Y = (double)control.Size.Height;
-            if ((coord >= location) & (coord <= location + size))
-                return true;
-            else
-                return false;
-
+            return ((coord >= location) & (coord <= location + size));
         }
 
         private void ChooseControl()
         {
             _trajectoryPartitionCollection = new List<int>();
             var orderControlCollection = new List<Control>();
-            int counter = 0;
-            int bufCounter = 0;
-            int formCounter = 0;
-            Control bufControl = new Control();
-            bool need = false;
-            bool isOwner = false;
-            bool isForm = false;
+            var counter = 0;
+            var bufCounter = 0;
+            var formCounter = 0;
+            var bufControl = new Control();
+            var need = false;
+            var isOwner = false;
+            var isForm = false;
             foreach (var coord in _trajectoryCoordsCollection)
             {
                 foreach (var control in _controlCollection)

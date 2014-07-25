@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Graphic;
-using Microsoft.DirectX.AudioVideoPlayback;
-using System.Web;
-
 
 namespace ClientsPart
 {
@@ -24,7 +15,7 @@ namespace ClientsPart
         private readonly GameController _controller;
         private string _shipType;
         private string _shipTurn;
-        private Cursor _cursor;
+        //private Cursor _cursor;
         private static int _counter = 0;
         
 
@@ -55,37 +46,13 @@ namespace ClientsPart
                 ShipTurnCMB.Enabled = false;
                 ShipTypeCMB.Enabled = false;
             }
-
-            //var graph = this.CreateGraphics();
-            //var rect1 = new Rectangle(100, 100, 50, 50);
-            //var rect2 = new Rectangle(125, 100, 50, 50);
-            //var rect3 = Rectangle.Intersect(rect1, rect2);
-            //graph.DrawRectangle(new Pen(Color.Red, 3) , rect3);
-            
-            
-
         }
-
 
         private void Field_Paint(object sender, PaintEventArgs e)
         {
             _controller.Redraw(e.ClipRectangle);
-            //if (e.ClipRectangle.Location.X != 0)
-            //{
-            //    _counter ++;
-            //    textBox1.Text += _counter + ") " + "( " + e.ClipRectangle.Location.X.ToString() + ";" +
-            //                 e.ClipRectangle.Location.Y.ToString() +
-            //                 " ); ";
-            //}
         }
         
-
-
-        private void Field_Hit_Paint(object sender, PaintEventArgs e)
-        {
-            
-        }
-
         private void ShipType_SelectedValueChanged(object sender, EventArgs e)
         {
             _shipType = ShipTypeCMB.SelectedItem.ToString();
@@ -103,11 +70,9 @@ namespace ClientsPart
 
         private void Field_Hit_MouseClick(object sender, MouseEventArgs e)
         {
-            textBox1.Text = String.Empty;
             if (!_controller.ClientsReady())
             {
                 _controller.HitShipOnClick(e);
-                _counter = 0;
             }
         }
 
@@ -136,12 +101,12 @@ namespace ClientsPart
 
         private void Field_MouseHover(object sender, EventArgs e)
         {
-            this.Cursor = _cursor;
+            //this.Cursor = _cursor;
         }
 
         private void Field_MouseLeave(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.Default;
+            //this.Cursor = Cursors.Default;
         }
 
     }

@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing.Text;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
 using GameUtils;
 using ClientsPart;
-using System.Web;
+using Microsoft.VisualBasic.PowerPacks;
 
 namespace Graphic
 {
@@ -18,7 +14,8 @@ namespace Graphic
         private Coordinates _gameOptionList;
         private Coordinates _gridOptionList;
         private readonly GameOptions _options;
-        private List<Rectangle> _bufRocketCoords;
+        private readonly RectangleData _rectData;
+        private IEnumerable<LineShape> _lineCollect;
 
         public Drawing(Graphics graph, GameOptions options)
         {
@@ -26,7 +23,7 @@ namespace Graphic
             _graph = graph;
             _gridOptionList = options.GridOptions;
             _gameOptionList = options.GameOption;
-            
+            _rectData = new RectangleData(options.MyBattleFieldLocation, options.GameOption, options.GridOptions);
         }
 
         public void DrawBattleFields(Rectangle rectangle)
@@ -60,7 +57,7 @@ namespace Graphic
         public void EraseShip(List<Coordinates> deleteShipCoords) { }
         public void DrawHitShip(Coordinates hitCoord, bool hit) 
         {
-            if (hit == true)
+            if (hit)
             {
                 var pen = new Pen(_options.HitShipColor, 2);
                 _graph.DrawLine(pen, (int)hitCoord.X, (int)hitCoord.Y, (int)(hitCoord.X + _gridOptionList.X),
@@ -81,8 +78,8 @@ namespace Graphic
             var pen = new Pen(_options.GridColor, 2);
             foreach (var shipCoord in destroyShipCoords)
             {
-                this._graph.DrawRectangle(pen, (int)shipCoord.X, (int)shipCoord.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
-                this._graph.FillRectangle(new SolidBrush(_options.DestroyShipColor), (int)shipCoord.X, (int)shipCoord.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                _graph.DrawRectangle(pen, (int)shipCoord.X, (int)shipCoord.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
+                _graph.FillRectangle(new SolidBrush(_options.DestroyShipColor), (int)shipCoord.X, (int)shipCoord.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
             }
         }
 
@@ -93,74 +90,19 @@ namespace Graphic
                 DrawAnimationRocket(rectangle, pen);
                 return;
             }
-            for (double i = deltaCoord.X; i <= (_gameOptionList + deltaCoord).X; i += _gridOptionList.X)
+            for (var i = deltaCoord.X; i <= (_gameOptionList + deltaCoord).X; i += _gridOptionList.X)
             {
                 _graph.DrawLine(pen, new Point((int)i, (int)deltaCoord.Y),
                                       new Point((int)i, (int)(_gameOptionList + deltaCoord).Y));
             }
-            for (double i = deltaCoord.Y; i <= (_gameOptionList + deltaCoord).Y; i += _gridOptionList.Y)
+            for (var i = deltaCoord.Y; i <= (_gameOptionList + deltaCoord).Y; i += _gridOptionList.Y)
             {
                 _graph.DrawLine(pen, new Point((int)deltaCoord.X, (int)i),
                     new Point((int)(_gameOptionList + deltaCoord).X, (int)i));
             }
 
         }
-
-        private Rectangle GetDeltaRectangle(Coordinates coord)
-        {
-            var deltaX = (int)(Math.Truncate(coord.X / _gridOptionList.X) * _gridOptionList.X) - 10;
-            var deltaY = (int)(Math.Truncate(coord.Y / _gridOptionList.Y) * _gridOptionList.Y);
-            return new Rectangle(deltaX, deltaY, (int)_gridOptionList.X, (int)_gridOptionList.Y);
-        }
-
-        private IEnumerable<Rectangle> ReturnRedrawRects(Rectangle rectangle)
-        {
-            bool first = false;
-            try
-            {
-                if (_bufRocketCoords == null)
-                {
-                    first = true;
-                    _bufRocketCoords = new List<Rectangle>();
-
-                }
-                var rectangleHeadCoords = new List<Rectangle>();
-                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X, rectangle.Y)));
-                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X + rectangle.Width, rectangle.Y)));
-                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height)));
-                rectangleHeadCoords.Add(GetDeltaRectangle(new Coordinates(rectangle.X, rectangle.Y + rectangle.Height)));
-                rectangleHeadCoords = new List<Rectangle>(rectangleHeadCoords.Distinct());
-                var redrawList = new List<Rectangle>();
-                if (!first)
-                {
-                    redrawList = (from bufRocketCoord in _bufRocketCoords
-                                  from rectangleHeadCoord in rectangleHeadCoords
-                                  where !bufRocketCoord.Contains(rectangleHeadCoord)
-                                  select bufRocketCoord).ToList();
-                }
-                foreach (var rectangleHeadCoord in
-                        rectangleHeadCoords.Where(rectangleHeadCoord => !_bufRocketCoords.Contains(rectangleHeadCoord)))
-                {
-                    _bufRocketCoords.Add(rectangleHeadCoord);
-                }
-                if (!first)
-                {
-                    foreach (var item in redrawList.Where(item => _bufRocketCoords.Contains(item)))
-                    {
-                        _bufRocketCoords.Remove(item);
-                    }
-                }
-                return redrawList;
-            }
-            catch (Exception e)
-            {
-                //MessageBox.Show(e.ToString());
-                return null;
-            }
-            
-        }
-
-        private int _counter = 0;
+        
         private void DrawAnimationRocket(Rectangle rectangle, Pen pen)
         {
             var baseRect1 = new Rectangle((int)_options.MyBattleFieldLocation.X, (int)_options.MyBattleFieldLocation.Y, (int)_gameOptionList.X, (int)_gameOptionList.Y);
@@ -169,15 +111,24 @@ namespace Graphic
             {
                 foreach (var rect in ReturnRedrawRects(rectangle))
                 {
-                    _graph.DrawRectangle(pen, rect.X, rect.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
-                    //_graph.DrawRectangle(new Pen(Color.Blue, 2), rect.X, rect.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
-                    //var testpen = new Pen(Color.FromArgb(0, 0, _counter));
-                    //_graph.DrawRectangle(testpen, rect.X, rect.Y, (int)_gridOptionList.X, (int)_gridOptionList.Y);
-                   
+                    //_graph.DrawLine(pen, rect.X1, rect.Y1, rect.X2, rect.Y2);
+                    _graph.DrawLine(new Pen(Color.Blue, 2), rect.X1, rect.Y1, rect.X2, rect.Y2);
                 }
-                _counter += 10;
             }
         }
+
+        private IEnumerable<LineShape> ReturnRedrawRects(Rectangle rectangle)
+        {
+            if (_lineCollect == null)
+            {
+                _lineCollect = new List<LineShape>();
+            }
+            var resultRects = new List<LineShape>(_lineCollect);
+            _lineCollect = new List<LineShape>(_rectData.ReturnIntersectionLineCoordinates(rectangle));
+            return resultRects;
+        }
+
+        
 
 
 

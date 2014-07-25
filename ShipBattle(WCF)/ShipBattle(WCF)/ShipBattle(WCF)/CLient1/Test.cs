@@ -6,8 +6,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Threading;
+using ClientWithForm.Shooting;
 using GameUtils;
-using Shooting;
 using System.IO;
 #endregion
 
@@ -26,11 +26,11 @@ namespace ClientsPart
         private List<Image> _imgCollection;
         private void button1_Click(object sender, EventArgs e)
         {
-            GameOptions options = new GameOptions();
+            var options = new GameOptions();
             options.RocketOption = new Coordinates(30, 30);
             _imgCollection = new List<Image>();
-            string path = @"C:\Projects\ShipBattle(WCF)_last\ShipBattle(WCF)\ShipBattle(WCF)\photos\bang\";
-            string[] fileNames = Directory.GetFiles(path);
+            const string path = @"C:\Projects\ShipBattle(WCF)_last\ShipBattle(WCF)\ShipBattle(WCF)\photos\bang\";
+            var fileNames = Directory.GetFiles(path);
             foreach (var fileName in fileNames)
             { 
                 _imgCollection.Add(Image.FromFile(fileName));
@@ -44,12 +44,12 @@ namespace ClientsPart
         }
 
 
-        int counter = 0;
+        private int _counter = 0;
         private void button2_Click(object sender, EventArgs e)
         {
             var arg = new MyEventArgs();
-            arg.str = counter.ToString();
-            counter++;
+            arg.str = _counter.ToString();
+            _counter++;
             myEvent(sender, arg);
         }
 

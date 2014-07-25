@@ -9,7 +9,7 @@ namespace Shooting
 {
     public class ImageHandler
     {
-        private List<Image> _imageCollection;
+        private readonly List<Image> _imageCollection;
         private Graphics _graphics;
         public ImageHandler()
         {
