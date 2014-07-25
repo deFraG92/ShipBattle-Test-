@@ -107,8 +107,8 @@ namespace ClientsPart
         private void RocketAnimationInit()
         {
             _rocketImg = new List<Image>();
-            _rocketImg.Add(Image.FromFile(@"C:\Projects\ShipBattle(GIT)\ShipBattle(WCF)\photos\rocket.png"));
-            //_rocketImg.Add(Image.FromFile(@"D:\Projects\ShipBattle(WCF)\ShipBattle(WCF)\ShipBattle(WCF)_last\ShipBattle(WCF)\ShipBattle(WCF)\photos\rocket.png"));
+            //_rocketImg.Add(Image.FromFile(@"C:\Projects\ShipBattle(GIT)\ShipBattle(WCF)\photos\rocket.png"));
+            _rocketImg.Add(Image.FromFile(@"D:\Projects\ShipBattle(GIT)\ShipBattle(WCF)\photos\rocket.png"));
             _options.RocketOption = new Coordinates(20, 20);
         }
         
