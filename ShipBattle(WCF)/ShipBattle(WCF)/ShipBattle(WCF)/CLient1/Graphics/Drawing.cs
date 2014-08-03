@@ -14,7 +14,7 @@ namespace Graphic
         private Coordinates _gameOptionList;
         private Coordinates _gridOptionList;
         private readonly GameOptions _options;
-        //private readonly RectangleData _rectData;
+        private readonly RectangleData _rectData;
         private IEnumerable<LineShape> _lineCollect;
 
         public Drawing(Graphics graph, GameOptions options)
@@ -23,7 +23,7 @@ namespace Graphic
             _graph = graph;
             _gridOptionList = options.GridOptions;
             _gameOptionList = options.GameOption;
-            //_rectData = new RectangleData(options.MyBattleFieldLocation, options.GameOption, options.GridOptions);
+            _rectData = new RectangleData(options.MyBattleFieldLocation, options.GameOption, options.GridOptions);
         }
 
         public void DrawBattleFields(Rectangle rectangle)
@@ -111,8 +111,8 @@ namespace Graphic
             {
                 foreach (var rect in ReturnRedrawRects(rectangle))
                 {
-                    //_graph.DrawLine(pen, rect.X1, rect.Y1, rect.X2, rect.Y2);
-                    _graph.DrawLine(new Pen(Color.Blue, 2), rect.X1, rect.Y1, rect.X2, rect.Y2);
+                    _graph.DrawLine(pen, rect.X1, rect.Y1, rect.X2, rect.Y2);
+                    //_graph.DrawLine(new Pen(Color.Blue, 2), rect.X1, rect.Y1, rect.X2, rect.Y2);
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace Graphic
                 _lineCollect = new List<LineShape>();
             }
             var resultRects = new List<LineShape>(_lineCollect);
-            //_lineCollect = new List<LineShape>(_rectData.ReturnIntersectionLineCoordinates(rectangle));
+            _lineCollect = new List<LineShape>(_rectData.ReturnIntersectionLineCoordinates(rectangle));
             return resultRects;
         }
 

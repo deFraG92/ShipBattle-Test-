@@ -8,8 +8,7 @@ using GameUtils;
 using Microsoft.VisualBasic.PowerPacks;
 
 namespace Graphic
-{
-    public class RectangleData
+{   public class RectangleData
     {
         private readonly Coordinates _location;
         private readonly Coordinates _rectSize;
